@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
-from .forms import UserSignup, UserLogin
+from .models import Event
+from .forms import UserSignup, UserLogin, EventCreateForm
+from django.contrib import messages
+
 
 def home(request):
     return render(request, 'home.html')
@@ -46,7 +49,7 @@ class Login(View):
             if auth_user is not None:
                 login(request, auth_user)
                 messages.success(request, "Welcome Back!")
-                return redirect('dashboard')
+                return redirect('list-create')
             messages.warning(request, "Wrong email/password combination. Please try again.")
             return redirect("login")
         messages.warning(request, form.errors)
@@ -59,3 +62,25 @@ class Logout(View):
         messages.success(request, "You have successfully logged out.")
         return redirect("login")
 
+#Create Event View:
+
+def EventCreate(request):
+    form = EventCreateForm()
+    if request.method == "POST":
+        form = CreateEventForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('list-create') # did not do it yet (create list)
+    context = {
+        "form":form,
+    }
+    return render(request, 'create.html', context)
+
+#List Of Events View:
+
+def EventList(request):
+    events = Event.objects.all()
+    context = {
+        "events" : events,
+    }
+    return render(request,'list.html',context)
