@@ -19,4 +19,4 @@ class UserLogin(forms.Form):
 class EventCreateForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = '__all__'
+        exclude = ['organizer']

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header class="masthead text-center text-black">
+  <div class="masthead-content">
+<div class = "container">
+
+<div class="row mt-5">
+	{% for event in events %}
+<div class="col-sm-4 mt-5">
+	<div class="card">
+		<div class="card-body">
+			<h5 class="card-title">Name: {{event.title}}</h5>
+			<p class="card-text">Description: {{event.description}}</p>
+			<p class="card-text">Date: {{event.date}}</p>
+			<p class="card-text">Time: {{event.time}}</p>
+			<p class="card-text">Location: {{event.location}}</p>
+			<p class="card-text">Capacity: {{event.capacity}}</p>
+
+			<a href="{{event.get_absolute_url}}" class="btn" style="background-color: #e3f2fd; color: black;">View</a>
+
+		</div>
+	</div>
+</div>
+
+	{% endfor %}
+</div>
+</div>
+</div>
+<div class="bg-circle-1 bg-circle"></div>
+<div class="bg-circle-2 bg-circle"></div>
+<div class="bg-circle-3 bg-circle"></div>
+<div class="bg-circle-4 bg-circle"></div>
+</header>
+
+
+{% endblock content %}

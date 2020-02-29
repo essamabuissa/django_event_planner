@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
-from .models import Event
+from .models import Event , Booking
 from .forms import UserSignup, UserLogin, EventCreateForm
 from django.contrib import messages
+from datetime import datetime
+from django.db.models import Q
+
 
 
 def home(request):
@@ -49,7 +52,8 @@ class Login(View):
             if auth_user is not None:
                 login(request, auth_user)
                 messages.success(request, "Welcome Back!")
-                return redirect('list-create')
+                return redirect('event-list')
+
             messages.warning(request, "Wrong email/password combination. Please try again.")
             return redirect("login")
         messages.warning(request, form.errors)
@@ -65,22 +69,88 @@ class Logout(View):
 #Create Event View:
 
 def EventCreate(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+
     form = EventCreateForm()
     if request.method == "POST":
-        form = CreateEventForm(request.POST, request.FILES)
+        form = EventCreateForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('list-create') # did not do it yet (create list)
+            event = form.save(commit = False)
+            event.organizer = request.user
+            event.save()
+            messages.success(request , "Event Successfully Created!")
+            return redirect('dashboard') # did not do it yet (create list)
     context = {
         "form":form,
     }
     return render(request, 'create.html', context)
 
-#List Of Events View:
 
+#List Of Events View:
 def EventList(request):
-    events = Event.objects.all()
+    events = Event.objects.filter(date__gt = datetime.today())
+    query = request.GET.get("q")
+    if query:
+        events = events.filter(
+            Q(title__icontains=query)|
+            Q(description__icontains=query)|
+            Q(organizer__username__icontains=query)
+            ).distinct()
     context = {
         "events" : events,
     }
     return render(request,'list.html',context)
+
+#Event Details View:
+def EventDetail(request , event_id):
+    event = Event.objects.get(id = event_id)
+    context = {
+    "event" : event,
+    }
+    return render(request,'detail.html',context)
+
+#Event Update View:
+def EventUpdate(request,event_id):
+    event_obj = Event.objects.get(id = event_id)
+    form = EventCreateForm(instance = event_obj)
+    if request.method == "POST":
+        form = EventCreateForm(request.POST , instance = event_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request , "Event Successfully Updated!")
+            return redirect('event-detail',event_id) # did not do it yet (create list)
+    context = {
+        "form":form,
+        "event": event_obj
+    }
+    return render(request, 'update.html', context)
+
+#Event Delete View:
+def EventDelete(request,event_id):
+    event = Event.objects.get(id = event_id)
+    
+    event.delete()
+    messages.success(request,"Event Successfully Deleted!")
+    return redirect('event-list')
+
+#Event Dashboard for the organizer:
+def EventDashboard(request):
+    if request.user.is_anonymous:
+        redirect('login')
+    events = Event.objects.filter(organizer = request.user)
+
+    context = {
+    "events" : events
+    }
+
+    return render(request,"dashboard.html",context)
+
+#keep it like this dont touch it
+"""def TicketsLeft(request,event_id,booking_id):
+    event = Event.objects.get(id = event_id)
+    booking = Booking.objects.get(id = booking_id )
+    if request.method == "POST":
+        if booking.tickets_bought > event.capacity:
+            messages.success(request , "Sorry this event is fully booked!")
+    """

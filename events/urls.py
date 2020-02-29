@@ -10,6 +10,11 @@ urlpatterns = [
 
 	#Views Urls
 	path('create/', views.EventCreate, name='event-create'),
-	path('list/', views.EventList, name='list-create'),
+	path('list/', views.EventList, name='event-list'),
+	path('detail/<int:event_id>', views.EventDetail, name='event-detail'),
+	path('update/<int:event_id>', views.EventUpdate, name='event-update'),
+	path('delete/<int:event_id>', views.EventDelete, name='event-delete'),
+	path('dashboard/', views.EventDashboard, name='dashboard'),
+
 
 ]

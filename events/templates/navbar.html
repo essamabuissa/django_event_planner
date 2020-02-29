@@ -10,19 +10,26 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
         </li>
-        
+
         <li class="nav-item">
           <a class="nav-link" href="{% url 'login' %}">Log In</a>
         </li>
         {% else %}
         <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="{% url 'event-create' %}">Create Event</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+          <a class="nav-link" href="{% url 'event-list' %}">{{ request.user }}</a>
         </li>
+        <form action="{% url 'event-list' %}" method="GET">
+          <input type="text" name='q' placeholder="Search here...">
+          <input type="submit" value="Search">
+        </form>
         <li class="nav-item">
-          <a class="nav-link" href="#">{{ request.user }}</a>
+          <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
         </li>
         {% endif %}
       </ul>
