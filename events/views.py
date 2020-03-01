@@ -129,7 +129,7 @@ def EventUpdate(request,event_id):
 #Event Delete View:
 def EventDelete(request,event_id):
     event = Event.objects.get(id = event_id)
-    
+
     event.delete()
     messages.success(request,"Event Successfully Deleted!")
     return redirect('event-list')
@@ -145,12 +145,3 @@ def EventDashboard(request):
     }
 
     return render(request,"dashboard.html",context)
-
-#keep it like this dont touch it
-"""def TicketsLeft(request,event_id,booking_id):
-    event = Event.objects.get(id = event_id)
-    booking = Booking.objects.get(id = booking_id )
-    if request.method == "POST":
-        if booking.tickets_bought > event.capacity:
-            messages.success(request , "Sorry this event is fully booked!")
-    """
