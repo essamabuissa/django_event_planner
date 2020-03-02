@@ -8,6 +8,7 @@
 
 		<div class="row">
 			{% for event in events %}
+
 		<div class="col-sm-4">
 			<div class="card bg">
 				<div class="card-body">
@@ -19,12 +20,14 @@
 					<p class="card-text">Capacity: {{event.capacity}}</p>
 
 					<a href="{{event.get_absolute_url}}" class="btn" style="background-color:#E74C3C; color: white;">View</a>
+
 				</div>
 			</div>
 
 		</div>
 			{% endfor %}
 		</div>
+    
 
 		</div>
   </div>

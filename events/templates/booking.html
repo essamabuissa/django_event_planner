@@ -7,7 +7,7 @@
         <div class="jumbotron">
           <input  class="form-control"  aria-label="Recipient's username" aria-describedby="basic-addon2">
 
-          <form action="{% url 'booking' event.id total_tickets %}" method="POST">
+          <form action="{% url 'booking' event.id total%}" method="POST">
             {% csrf_token %}
             {{form|crispy}}
 
