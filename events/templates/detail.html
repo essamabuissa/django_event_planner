@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -18,12 +19,15 @@
         <p class="card-text">Date: {{event.date}}</p>
         <p class="card-text">Time: {{event.time}}</p>
         <p class="card-text">Location: {{event.location}}</p>
-        <p class="card-text">Capacity: {{event.capacity}}</p>
+        <p class="card-text">Capacity: {{total_tickets}}/{{event.capacity}}</p>
         <div class="input-group mb-3">
-  <input type="text" class="form-control" placeholder="Enter number of tickets you want to book" aria-label="Recipient's username" aria-describedby="basic-addon2">
-  <div class="input-group-append">
-    <button class="btn btn-outline-danger" type="button">Book</button>
-  </div>
+  <input  class="form-control"  aria-label="Recipient's username" aria-describedby="basic-addon2">
+  <form action="{% url 'booking' event.id total_tickets %}" method="POST">
+    {% csrf_token %}
+    {{form|crispy}}
+
+    <input type ="submit" class = "btn btn-primary btn-xl rounded-pill mt-5" value="Book">
+  </form>
 </div>
 
       </div>
@@ -62,9 +66,10 @@
       </tbody>
 
     </table>
+    {% if request.user == event.organizer %}
     <a href="{% url 'event-update' event.id %}" class="btn" style="background-color: #000034; color: white;">Update</a>
     <a href="{% url 'event-delete' event.id %}" class="btn" style="background-color: #000034; color: white;">Delete</a>
-
+    {% endif %}
   </div>
   <div class="bg-circle-1 bg-circle"></div>
   <div class="bg-circle-2 bg-circle"></div>

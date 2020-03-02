@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
 from .models import Event , Booking
-from .forms import UserSignup, UserLogin, EventCreateForm
+from .forms import UserSignup, UserLogin, EventCreateForm , BookingForm
 from django.contrib import messages
 from datetime import datetime
 from django.db.models import Q
+
 
 
 
@@ -52,7 +53,7 @@ class Login(View):
             if auth_user is not None:
                 login(request, auth_user)
                 messages.success(request, "Welcome Back!")
-                return redirect('event-list')
+                return redirect('dashboard')
 
             messages.warning(request, "Wrong email/password combination. Please try again.")
             return redirect("login")
@@ -89,6 +90,7 @@ def EventCreate(request):
 
 #List Of Events View:
 def EventList(request):
+    future_events = []
     events = Event.objects.filter(date__gt = datetime.today())
     query = request.GET.get("q")
     if query:
@@ -105,14 +107,23 @@ def EventList(request):
 #Event Details View:
 def EventDetail(request , event_id):
     event = Event.objects.get(id = event_id)
+    bookings = Booking.objects.filter(id = event_id)
+    number_of_tickets = 0
+    for book in bookings:
+        number_of_tickets += book.tickets
+
     context = {
     "event" : event,
+    "total_tickets" : number_of_tickets,
+    "bookings":bookings
     }
     return render(request,'detail.html',context)
 
 #Event Update View:
 def EventUpdate(request,event_id):
     event_obj = Event.objects.get(id = event_id)
+    if request.user != event_obj.organizer:
+        return redirect('login')
     form = EventCreateForm(instance = event_obj)
     if request.method == "POST":
         form = EventCreateForm(request.POST , instance = event_obj)
@@ -129,7 +140,8 @@ def EventUpdate(request,event_id):
 #Event Delete View:
 def EventDelete(request,event_id):
     event = Event.objects.get(id = event_id)
-
+    if request.user != event.organizer:
+        return redirect('login')
     event.delete()
     messages.success(request,"Event Successfully Deleted!")
     return redirect('event-list')
@@ -145,3 +157,36 @@ def EventDashboard(request):
     }
 
     return render(request,"dashboard.html",context)
+
+def Book(request,event_id,total_tickets):
+    form = BookingForm()
+    event = Event.objects.get(id = event_id)
+    user_booking = Booking.objects.all(  )
+    if request.user.is_anonymous:
+        return redirect('login')
+
+        return redirect("event-detail",event_id)
+    if request.method == "POST":
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit = False)
+            if total_tickets == event.capacity:
+                messages.success(request , "This event is full!")
+
+            elif booking.tickets + total_tickets > event.capacity:
+                messages.warning(request,"Sorry this event is fully booked!")
+                return redirect("event-detail",event_id)
+
+            
+            booking.user = request.user
+            booking.event= event
+            booking.save()
+            messages.success(request , "Event Successfully Booked!")
+            return redirect("event-detail",event_id)
+    context = {
+    "event" : event,
+    "form" :form,
+    "total_tickets":total_tickets
+    }
+
+    return render(request,"booking.html" , context)

@@ -15,6 +15,7 @@ urlpatterns = [
 	path('update/<int:event_id>', views.EventUpdate, name='event-update'),
 	path('delete/<int:event_id>', views.EventDelete, name='event-delete'),
 	path('dashboard/', views.EventDashboard, name='dashboard'),
+	path('booking/<int:event_id>/<int:total_tickets>', views.Book, name='booking'),
 
 
 ]

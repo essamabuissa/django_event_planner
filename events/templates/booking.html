@@ -5,12 +5,14 @@
   <div class="masthead-content">
     <div class="container">
         <div class="jumbotron">
-          <h2 class="masthead-subheading mb-0">Create Event</h2>
-          <form action="{% url 'event-create' %}" method="POST">
+          <input  class="form-control"  aria-label="Recipient's username" aria-describedby="basic-addon2">
+
+          <form action="{% url 'booking' event.id total_tickets %}" method="POST">
             {% csrf_token %}
             {{form|crispy}}
-            <input type ="submit" class = "btn btn-primary btn-xl rounded-pill mt-5" value="Create">
-          </form>
+
+            <input type ="submit" class = "btn btn-primary btn-xl rounded-pill mt-5" value="Book">
+            </form>
       </div>
     </div>
   </div>
