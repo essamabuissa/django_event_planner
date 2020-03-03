@@ -11,7 +11,7 @@ class Event(models.Model):
     location = models.CharField(max_length = 50)
     capacity = models.IntegerField()
     organizer = models.ForeignKey(User , on_delete = models.CASCADE)
-
+    image = models.ImageField(upload_to = None , blank = True)
 
 
 
